@@ -1,0 +1,1 @@
+This is a set of tools for interfacing with *jiloj* services. These are intended to be scripts for automating processes related to a certain *jiloj* service, but not pertaining to the service implementation itself. The majority of scripts will be python due to lack of a much better alternative.
