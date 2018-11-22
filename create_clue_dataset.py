@@ -13,15 +13,16 @@ import sys
 
 import requests
 
+
+JNODE_CLUES_URL = 'http://localhost:9000/clues/'
+FIELDNAMES = ['id', 'category', 'question', 'answer', 'round', 'value', 'semanticcategory']
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('filename', help='The name of the output filename')
 parser.add_argument('-r', '--random', action='store_true',
         help='Whether the output order of clues should be random.')
 args = parser.parse_args()
-
-
-JNODE_CLUES_URL = 'http://localhost:9000/clues/'
-FIELDNAMES = ['id', 'category', 'question', 'answer', 'round', 'value']
 
 resp = requests.get(JNODE_CLUES_URL)
 clues = resp.json()
