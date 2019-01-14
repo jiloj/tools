@@ -67,7 +67,7 @@ with open(args.source, newline='') as source_f:
 annotated_rows = []
 rest_rows = []
 with open(args.destination, newline='') as destination_f:
-    destination_reader = csv.DictReader(destination_f, FIELDNAMES)
+    destination_reader = csv.DictReader(destination_f)
 
     for row in destination_reader:
         d = row_to_dict(row)
