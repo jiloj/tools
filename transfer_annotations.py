@@ -10,6 +10,8 @@ import argparse
 import csv
 import random
 
+import data
+
 
 def row_to_key(row):
     """
@@ -45,9 +47,6 @@ def row_to_dict(row):
     }
 
 
-FIELDNAMES = ['id', 'category', 'question', 'answer', 'round', 'value', 'semanticcategory']
-
-
 parser = argparse.ArgumentParser()
 parser.add_argument('source', help='The source file of the annotations')
 parser.add_argument('destination',
@@ -58,7 +57,7 @@ args = parser.parse_args()
 
 source_annotations = {}
 with open(args.source, newline='') as source_f:
-    source_reader = csv.DictReader(source_f, FIELDNAMES)
+    source_reader = csv.DictReader(source_f)
 
     for row in source_reader:
         if row['semanticcategory']:
@@ -79,7 +78,8 @@ with open(args.destination, newline='') as destination_f:
             rest_rows.append(d)
 
 with open(args.output, 'w', newline='') as output_f:
-    writer = csv.DictWriter(output_f, FIELDNAMES)
+    writer = csv.DictWriter(output_f, data.FieldNames)
+    writer.writeheader()
 
     for row in annotated_rows:
         writer.writerow(row)
