@@ -20,12 +20,16 @@ def validate(row, categories):
             categories are all lowercased.
     """
     sc = row['semanticcategory'].lower()
-    if sc and sc not in categories:
-        print('Entry:')
-        print('Question: {}'.format(row['question']))
-        print('Answer: {}'.format(row['answer']))
-        print('Invalid category: {}'.format(sc))
-        print()
+    return sc or sc in categories
+
+
+def display_invalid_info(row):
+    """
+    """
+    print('Entry:')
+    print('Question: {}'.format(row['question']))
+    print('Answer: {}'.format(row['answer']))
+    print('Invalid category: {}'.format(sc))
 
 
 def normalize(row):
@@ -47,6 +51,7 @@ SEMANTIC_CATEGORIES = set(('history', 'sports', 'geography', 'culture', 'science
 parser = argparse.ArgumentParser()
 parser.add_argument('filename', help='The input filename of the training set to validate.')
 parser.add_argument('output', help='The file to output the new training set to.')
+parser.add_argument('--strict', action='store_true', help='Keeps only validated rows')
 args = parser.parse_args()
 
 with open(args.filename, newline='') as read_f, open(args.output, 'w', newline='') as output_f:
@@ -54,7 +59,10 @@ with open(args.filename, newline='') as read_f, open(args.output, 'w', newline='
     writer = csv.DictWriter(output_f, FIELDNAMES)
 
     for i, row in enumerate(reader):
-        validate(row, SEMANTIC_CATEGORIES)
-        normalize(row)
+        v = validate(row, SEMANTIC_CATEGORIES)
+        if not v:
+            display_invalid_info(row)
 
-        writer.writerow(row)
+        if not args.strict or v:
+            normalize(row)
+            writer.writerow(row)
