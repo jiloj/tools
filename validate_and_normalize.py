@@ -20,12 +20,17 @@ def validate(row, categories):
             categories are all lowercased.
     """
     sc = row['semanticcategory'].lower()
-    return sc or sc in categories
+    return sc in categories
 
 
 def display_invalid_info(row):
     """
+    Display info on the row as an invalid row.
+
+    Args:
+        row: The row to display the info of as an invalid row.
     """
+    sc = row['semanticcategory'].lower()
     print('Entry:')
     print('Question: {}'.format(row['question']))
     print('Answer: {}'.format(row['answer']))
@@ -57,6 +62,7 @@ args = parser.parse_args()
 with open(args.filename, newline='') as read_f, open(args.output, 'w', newline='') as output_f:
     reader = csv.DictReader(read_f, FIELDNAMES)
     writer = csv.DictWriter(output_f, FIELDNAMES)
+    writer.writeheader()
 
     for i, row in enumerate(reader):
         v = validate(row, SEMANTIC_CATEGORIES)
