@@ -25,7 +25,7 @@ args = parser.parse_args()
 
 annotated_data = {}
 with open(args.data, newline='') as input_f:
-    reader = csv.DictReader(input_f, FIELDNAMES)
+    reader = csv.DictReader(input_f)
 
     for row in reader:
         clue_id = row['id']
@@ -34,7 +34,7 @@ with open(args.data, newline='') as input_f:
         if cat:
             annotated_data[clue_id] = cat
 
-resp = requests.post(JTAGGER_CREATE_TAGGER_URL, {
+resp = requests.post(JTAGGER_CREATE_TAGGER_URL, json = {
     'name': args.name,
     'data': annotated_data
 })
@@ -44,7 +44,7 @@ try:
     j = resp.json()
 
     if j['success']:
-        print('Tagger creating successfully.')
+        print('Tagger created successfully.')
     else:
         print('Tagger not created succesfully. Response printed below.')
         print(resp.text)
