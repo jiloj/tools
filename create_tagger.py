@@ -45,6 +45,7 @@ try:
 
     if j['success']:
         print('Tagger created successfully.')
+        print('Check status on {}'.format(j['task']))
     else:
         print('Tagger not created succesfully. Response printed below.')
         print(resp.text)
