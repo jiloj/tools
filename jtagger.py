@@ -6,8 +6,9 @@ A utility module for holding jtagger functionality.
 import requests
 
 
-JTAGGER_CREATE_TAGGER_URL = 'http://localhost:9001/taggerrefs/'
-JTAGGER_TAG_URL = 'http://localhost:9001/tag'
+JTAGGER_CREATE_TAGGER_URL = 'http://localhost:9002/taggers/'
+JTAGGER_TAG_URL = 'http://localhost:9002/tag'
+JTAGGER_TASK_URL = 'http://localhost:9002/tasks/'
 
 
 def create(name, train):
@@ -19,22 +20,29 @@ def create(name, train):
         train: The training data to use, as a list of clues.
 
     Returns:
-        True if the tagger was succesfully created and False otherwise.
+        True if the tagger was succesfully created and False otherwise, with the Tagger creation task id.
     """
-    formatted_train = {}
-    for item in train:
-        formatted_train[item.id] = item.semanticcategory
-
     resp = requests.post(JTAGGER_CREATE_TAGGER_URL, json = {
         'name': name,
-        'data': formatted_train
+        'datapath': train
     })
 
     # TODO: What is the point of this line?
     resp.raise_for_status()
     j = resp.json()
 
-    return j['success']
+    return (j['success'], j['task'])
+
+
+def task_status(task_id):
+    """
+    """
+    task_url = JTAGGER_TASK_URL + task_id
+    resp = requests.get(task_url)
+    resp.raise_for_status()
+    j = resp.json()
+
+    return (j['tracked'], j['completed'])
 
 
 def tag(name, category, question, answer, r, v):

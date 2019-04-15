@@ -13,6 +13,7 @@ import requests
 
 import data
 import jtagger
+import ml
 
 
 """
@@ -23,20 +24,12 @@ JTAGGER_TAG_URL = 'http://localhost:9001/tag'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('data', help='The dataset to evaluate the tagger on.')
-parser.add_argument('name', help='The name of the tagger to evaluate.')
 args = parser.parse_args()
 
 correct = 0
 total = 0
 
 dataset = data.load_dataset_from_csv(args.data)
-for item in dataset:
-    r = int(item.round)
-    v = int(item.value)
-    guess = jtagger.tag(args.name, item.category, item.question, item.answer, r, v)
-    actual = item.semanticcategory
-
-    correct += int(actual.lower() == guess.lower())
-    total += 1
-
-print(correct / total)
+accuracies = ml.cross_validate(dataset, 10)
+print(accuracies)
+print(sum(accuracies) / len(accuracies))

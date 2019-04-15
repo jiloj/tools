@@ -2,8 +2,12 @@
 A temporary module to hold all of the ml / evaluation type logic.
 """
 
+import csv
 import itertools
+import os
+import time
 
+import data
 import jtagger
 
 
@@ -42,6 +46,8 @@ def cross_validate(dataset, n):
     Returns:
         The accuracy for each of the batches during cross validation.
     """
+    run_id = int(time.time())
+
     accuracies = []
 
     total = len(dataset)
@@ -60,9 +66,29 @@ def cross_validate(dataset, n):
         # TODO: make immutable
         test_batch = dataset[start:end]
         train_batch = dataset[:start] + dataset[end:]
-        jtagger.create(str(n), train_batch)
+        train_filename = '{}-{}.csv'.format(run_id, batch_num)
 
-        accuracy = evaluate_tagger(tagger, test_batch)
+        abs_path = ''
+        with open(train_filename, 'w', newline='') as f:
+            abs_path = os.path.abspath(f.name)
+            writer = csv.DictWriter(f, data.FieldNames)
+            writer.writeheader()
+            for row in train_batch:
+                writer.writerow(row.__dict__)
+
+        tagger_instance_name = '{}-{}'.format(run_id, batch_num)
+        success, task_id = jtagger.create(tagger_instance_name, abs_path)
+        print('Creating tagger {}'.format(tagger_instance_name))
+
+        # Wait until the tagger completes.
+        tagger_complete = False
+        while not tagger_complete:
+            _, tagger_complete = jtagger.task_status(task_id)
+            print('Waiting 5 seconds for {}'.format(tagger_instance_name))
+            time.sleep(5)
+
+        accuracy = evaluate_tagger(tagger_instance_name, test_batch)
+        print('{} accuracy for batch #{}'.format(accuracy, batch_num))
         accuracies.append(accuracy)
 
         batch_num += 1
